@@ -1,8 +1,33 @@
 {
   "name": "vue-sticky-box",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "private": true,
+  "description": "A simple vue component to be sticky",
+  "keywords": [
+    "vue",
+    "vuejs",
+    "sticky",
+    "vue-sticky",
+    "vuejs-sticky",
+    "vuejs-sticky-box",
+    "vuejs-sticky-sidebar",
+    "vue-sticky-sidebar",
+    "vue-sticky-box"
+  ],
+  "homepage": "https://github.com/Navidkhm/vue-sticky-box",
+  "bugs": {
+    "url": "https://github.com/Navidkhm/vue-sticky-box/issues"
+  },
+  "author": "Navid Khm <navidkhm@gmail.com>",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Navidkhm/vue-sticky-box.git"
+  },
+  "files": [
+    "dist"
+  ],
   "type": "module",
+  "license": "MIT",
   "scripts": {
     "dev": "vite",
     "build": "run-p type-check \"build-only {@}\" --",
