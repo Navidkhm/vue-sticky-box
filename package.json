@@ -1,7 +1,6 @@
 {
   "name": "vue-sticky-box",
-  "version": "1.0.0",
-  "private": true,
+  "version": "1.0.2",
   "description": "A simple vue component to be sticky",
   "keywords": [
     "vue",
@@ -26,11 +25,21 @@
   "files": [
     "dist"
   ],
+  "main": "./dist/index-umd.js",
+  "module": "./dist/index-es.js",
+  "exports": {
+    ".": {
+      "types": "./dist/StickyBox.vue.d.ts",
+      "import": "./dist/index-es.js",
+      "require": "./dist/index-umd.js"
+    },
+    "./style.css": "./dist/vue-sticky-box.css"
+  },
   "type": "module",
   "license": "MIT",
   "scripts": {
     "dev": "vite",
-    "build": "run-p type-check \"build-only {@}\" --",
+    "build": "vite build && vue-tsc --emitDeclarationOnly",
     "preview": "vite preview",
     "build-only": "vite build",
     "type-check": "vue-tsc --build",
@@ -49,8 +58,8 @@
     "@vue/tsconfig": "^0.7.0",
     "eslint": "^9.14.0",
     "eslint-plugin-vue": "^9.30.0",
-    "npm-run-all2": "^7.0.2",
     "prettier": "^3.3.3",
+    "sass-embedded": "^1.83.1",
     "typescript": "~5.6.3",
     "vite": "^6.0.5",
     "vite-plugin-vue-devtools": "^7.6.8",

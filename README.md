@@ -1,6 +1,10 @@
 # vue-sticky-box
 
-This template should help get you started developing with Vue 3 in Vite.
+This package requires Vue 3 as a peer dependency. Ensure Vue is installed in your project:
+
+```bash
+npm install vue@^3.0.0
+```
 
 ## Recommended IDE Setup
 
