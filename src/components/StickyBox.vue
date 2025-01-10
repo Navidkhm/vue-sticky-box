@@ -1,49 +1,20 @@
 <script setup lang="ts">
-import { onMounted, reactive, ref } from 'vue';
+import { onMounted, reactive, ref, watch } from 'vue';
+
+const props = defineProps({
+  offsetTop: {
+    type: Number,
+    required: false,
+    default: 0,
+  },
+  offsetBottom: {
+    type: Number,
+    required: false,
+    default: 0,
+  },
+});
 
 const state = reactive({
-  boxes: [
-    {
-      isOpen: true,
-      title: 'title-1',
-      body: 'qwerqwrqwerwrwr',
-    },
-    {
-      isOpen: true,
-      title: 'title-2',
-      body: 'qwerqwrqwerwrwr',
-    },
-    {
-      isOpen: true,
-      title: 'title-3',
-      body: 'qwerqwrqwerwrwr',
-    },
-    {
-      isOpen: false,
-      title: 'title-4',
-      body: 'qwerqwrqwerwrwr',
-    },
-    {
-      isOpen: false,
-      title: 'title-5',
-      body: 'qwerqwrqwerwrwr',
-    },
-    {
-      isOpen: false,
-      title: 'title-6',
-      body: 'qwerqwrqwerwrwr',
-    },
-    {
-      isOpen: false,
-      title: 'title-7',
-      body: 'qwerqwrqwerwrwr',
-    },
-    {
-      isOpen: false,
-      title: 'title-8',
-      body: 'qwerqwrqwerwrwr',
-    },
-  ],
   isScrollDown: false,
   isScrollUp: false,
   currentScroll: 0,
@@ -51,18 +22,7 @@ const state = reactive({
   bottomLock: false,
 });
 
-const toggleBox = (index: number) => {
-  state.boxes[index].isOpen = !state.boxes[index].isOpen;
-};
-
 const scrollHandler = () => {
-  // console.log(window.scrollY, state.currentScroll, 'topLock', state.topLock, state.bottomLock);
-
-  console.log(
-    stickyRef.value.parentElement.clientHeight + stickyRef.value.parentElement.offsetTop,
-    window.scrollY + innerHeight,
-  );
-
   if (window.scrollY <= state.currentScroll) {
     state.isScrollUp = true;
     state.isScrollDown = false;
@@ -83,9 +43,8 @@ const scrollHandler = () => {
 
   state.currentScroll = window.scrollY;
 
-  if (stickyRef.value.clientHeight < innerHeight - (spaceFromTop + spaceFromBottom)) {
-    console.log('kkkk');
-    stickyRef.value.style.top = `${spaceFromTop}px`;
+  if (stickyRef.value.clientHeight + spaceFromTop.value < innerHeight) {
+    stickyRef.value.style.top = `${spaceFromTop.value}px`;
     stickyRef.value.style.position = 'sticky';
     state.topLock = true;
     state.bottomLock = false;
@@ -94,69 +53,73 @@ const scrollHandler = () => {
 
   if (state.isScrollUp) {
     if (state.bottomLock) {
-      console.log(diffScroll);
       state.bottomLock = false;
       const calcTop = stickyRef.value.offsetTop + diffScroll;
       stickyRef.value.style.top = `${calcTop}px`;
       stickyRef.value.style.position = 'relative';
-      console.log(stickyRef.value.offsetTop);
     }
   }
   if (state.isScrollDown) {
     if (state.topLock) {
-      console.log(diffScroll);
-
       state.topLock = false;
       const calcTop = stickyRef.value.offsetTop + diffScroll;
       stickyRef.value.style.top = `${calcTop}px`;
       stickyRef.value.style.position = 'relative';
-      console.log(stickyRef.value.offsetTop);
     }
   }
 };
 
 const topIntersection = ref();
 const bottomIntersection = ref();
-const top = ref();
-const bottom = ref();
+const topRef = ref();
+const bottomRef = ref();
 const stickyRef = ref();
-const spaceFromTop = 100;
-const spaceFromBottom = 20;
+const spaceFromTop = ref(props.offsetTop);
+const spaceFromBottom = ref(props.offsetBottom);
+
+watch(
+  () => props.offsetTop,
+  (newValue) => {
+    spaceFromTop.value = newValue;
+    topRef.value.style.top = `-${newValue}px`;
+  },
+);
+
+watch(
+  () => props.offsetBottom,
+  (newValue) => {
+    spaceFromBottom.value = newValue;
+    bottomRef.value.style.bottom = `-${newValue}px`;
+  },
+);
 
 const intersectionHandler = (entries: Array<IntersectionObserverEntry>) => {
   entries.forEach((entry: IntersectionObserverEntry) => {
-    console.log(window.scrollY, state.currentScroll, 'intersecting:', entry.target.classList[0]);
-
     if (state.isScrollDown) {
       if (entry.isIntersecting && entry.target.classList.contains('end')) {
-        console.log('qwer');
         state.bottomLock = true;
         state.topLock = false;
         stickyRef.value.style.position = 'sticky';
-        const calcTop = -(stickyRef.value.clientHeight + spaceFromBottom - innerHeight);
-        console.log(calcTop, stickyRef.value.clientHeight, innerHeight);
+        const calcTop = -(stickyRef.value.clientHeight + spaceFromBottom.value - innerHeight);
         stickyRef.value.style.top = `${calcTop}px`;
       }
 
       // if (entry.isIntersecting && entry.target.classList.contains('start')) {
-      //   console.log('gottttttta');
       //   state.topLock = true;
       //   state.bottomLock = false;
       //   stickyRef.value.style.position = 'sticky';
-      //   stickyRef.value.style.top = `${spaceFromTop}px`;
+      //   stickyRef.value.style.top = `${spaceFromTop.value}px`;
       // }
     }
     if (state.isScrollUp) {
       if (entry.isIntersecting && entry.target.classList.contains('start')) {
-        console.log('zxcv');
         state.topLock = true;
         state.bottomLock = false;
         stickyRef.value.style.position = 'sticky';
-        stickyRef.value.style.top = `${spaceFromTop}px`;
+        stickyRef.value.style.top = `${spaceFromTop.value}px`;
       }
 
       if (entry.isIntersecting && entry.target.classList.contains('end')) {
-        console.log('opoiy');
         state.topLock = false;
         state.bottomLock = true;
       }
@@ -165,17 +128,19 @@ const intersectionHandler = (entries: Array<IntersectionObserverEntry>) => {
 };
 
 onMounted(() => {
-  console.log('mounted');
   state.currentScroll = window.scrollY;
-  document.addEventListener('scroll', () => scrollHandler());
 
+  topRef.value.style.top = `-${spaceFromTop.value}px`;
+  bottomRef.value.style.bottom = `-${spaceFromBottom.value}px`;
+
+  document.addEventListener('scroll', () => scrollHandler());
   topIntersection.value = new IntersectionObserver(intersectionHandler, {});
   bottomIntersection.value = new IntersectionObserver(intersectionHandler, {});
-  topIntersection.value.observe(top.value);
-  bottomIntersection.value.observe(bottom.value);
+  topIntersection.value.observe(topRef.value);
+  bottomIntersection.value.observe(bottomRef.value);
 
   stickyRef.value.style.position = 'sticky';
-  stickyRef.value.style.top = `${spaceFromTop}px`;
+  stickyRef.value.style.top = `${spaceFromTop.value}px`;
   state.topLock = true;
 });
 </script>
@@ -183,57 +148,20 @@ onMounted(() => {
 <template>
   <div class="sticky-box">
     <div ref="stickyRef" class="sticky-content">
-      <span ref="top" class="start marked-sticky"> </span>
-      <div>
-        <div
-          v-for="(box, index) in state.boxes"
-          :key="index"
-          :class="['box', box.isOpen && 'is-open']"
-        >
-          <div class="box-header" @click="toggleBox(index)">
-            {{ box.title }}
-
-            <span class="box-toggle-icon">{{ box.isOpen ? '-' : '+' }}</span>
-          </div>
-
-          <div v-if="box.isOpen" class="box-body">{{ box.body }}</div>
-        </div>
+      <span ref="topRef" class="start marked-sticky-point" />
+      <div class="sticky-box-wrapper">
+        <slot></slot>
       </div>
-
-      <span ref="bottom" class="end marked-sticky"> </span>
+      <span ref="bottomRef" class="end marked-sticky-point" />
     </div>
   </div>
 </template>
 
 <style lang="scss">
 .sticky-box {
-  width: 270px;
   display: flex;
   flex-direction: column;
-  background: goldenrod;
   position: relative;
-}
-
-.box {
-  width: 100%;
-  border-bottom: 1px solid;
-  background-color: darkviolet;
-  padding: 4px 8px;
-  color: white;
-}
-
-.box-toggle-icon {
-  font-size: 20px;
-}
-
-.box-header {
-  display: flex;
-  justify-content: space-between;
-  cursor: pointer;
-}
-
-.box-body {
-  height: 100px;
 }
 
 .sticky-content {
@@ -241,18 +169,9 @@ onMounted(() => {
   position: relative;
 }
 
-.marked-sticky {
+.marked-sticky-point {
   position: absolute;
   width: 100%;
-  height: 1px;
-  background-color: blue;
-}
-
-.start {
-  top: -100px;
-}
-
-.end {
-  bottom: -20px;
+  height: 0px;
 }
 </style>
