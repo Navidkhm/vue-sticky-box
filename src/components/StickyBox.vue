@@ -12,6 +12,16 @@ const props = defineProps({
     required: false,
     default: 0,
   },
+  scrollInsideABox: {
+    type: Boolean,
+    required: false,
+    default: false,
+  },
+  scrolledBoxRef: {
+    type: HTMLElement,
+    required: false,
+    default: null,
+  },
 });
 
 const state = reactive({
@@ -20,10 +30,14 @@ const state = reactive({
   currentScroll: 0,
   topLock: false,
   bottomLock: false,
+  scrolledBoxElement: props.scrolledBoxRef,
+  innerHeight: window.innerHeight,
 });
 
-const scrollHandler = () => {
-  if (window.scrollY <= state.currentScroll) {
+const scrollHandler = (e: UIEvent): void => {
+  const scrollY = props.scrollInsideABox ? (e.target as HTMLElement).scrollTop : window.scrollY;
+
+  if (scrollY <= state.currentScroll) {
     state.isScrollUp = true;
     state.isScrollDown = false;
   } else {
@@ -31,19 +45,19 @@ const scrollHandler = () => {
     state.isScrollDown = true;
   }
 
-  let diffScroll = state.currentScroll - window.scrollY;
+  let diffScroll = state.currentScroll - scrollY;
 
   if (
-    window.scrollY < stickyRef.value.parentElement.offsetTop ||
+    scrollY < stickyRef.value.parentElement.offsetTop ||
     stickyRef.value.parentElement.clientHeight + stickyRef.value.parentElement.offsetTop <
-      window.scrollY + innerHeight
+      scrollY + state.innerHeight
   ) {
     diffScroll = 0;
   }
 
-  state.currentScroll = window.scrollY;
+  state.currentScroll = scrollY;
 
-  if (stickyRef.value.clientHeight + spaceFromTop.value < innerHeight) {
+  if (stickyRef.value.clientHeight + spaceFromTop.value < state.innerHeight) {
     stickyRef.value.style.top = `${spaceFromTop.value}px`;
     stickyRef.value.style.position = 'sticky';
     state.topLock = true;
@@ -100,7 +114,7 @@ const intersectionHandler = (entries: Array<IntersectionObserverEntry>) => {
         state.bottomLock = true;
         state.topLock = false;
         stickyRef.value.style.position = 'sticky';
-        const calcTop = -(stickyRef.value.clientHeight + spaceFromBottom.value - innerHeight);
+        const calcTop = -(stickyRef.value.clientHeight + spaceFromBottom.value - state.innerHeight);
         stickyRef.value.style.top = `${calcTop}px`;
       }
 
@@ -127,13 +141,19 @@ const intersectionHandler = (entries: Array<IntersectionObserverEntry>) => {
   });
 };
 
-onMounted(() => {
-  state.currentScroll = window.scrollY;
+const initiateFunctionality = () => {
+  if (props.scrollInsideABox) {
+    state.currentScroll = state.scrolledBoxElement?.offsetTop;
+    state.scrolledBoxElement.addEventListener('scroll', (e) => scrollHandler(e as UIEvent));
+    state.innerHeight = state.scrolledBoxElement.clientHeight;
+  } else {
+    state.currentScroll = scrollY;
+    document.addEventListener('scroll', (e) => scrollHandler(e as UIEvent));
+  }
 
   topRef.value.style.top = `-${spaceFromTop.value}px`;
   bottomRef.value.style.bottom = `-${spaceFromBottom.value}px`;
 
-  document.addEventListener('scroll', () => scrollHandler());
   topIntersection.value = new IntersectionObserver(intersectionHandler, {});
   bottomIntersection.value = new IntersectionObserver(intersectionHandler, {});
   topIntersection.value.observe(topRef.value);
@@ -142,6 +162,10 @@ onMounted(() => {
   stickyRef.value.style.position = 'sticky';
   stickyRef.value.style.top = `${spaceFromTop.value}px`;
   state.topLock = true;
+};
+
+onMounted(() => {
+  initiateFunctionality();
 });
 </script>
 
