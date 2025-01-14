@@ -66,7 +66,7 @@ const scrollInto = (ref) => {
     <div class="intro py-8">
       <div class="flex-col flex-center">
         <div class="intro-heading flex-center h1">
-          <img src="/vue-sticky-box-logo.png" alt="vue-sticky-box-logo" width="100px" />
+          <!-- <img :src="logI" alt="vue-sticky-box-logo" width="100px" /> -->
           <h1 class="text-center mb-0">Vue Sticky Box</h1>
         </div>
 
