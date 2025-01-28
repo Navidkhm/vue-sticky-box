@@ -3500,7 +3500,7 @@ function Zo(e) {
 function Qo(e) {
   return J(e) ? document.querySelector(e) : e;
 }
-const el = '/assets/vue-sticky-box-logo-Bvh5CIe1.png',
+const el = '/vue-sticky-box/assets/vue-sticky-box-logo-Bvh5CIe1.png',
   tl = { class: 'sticky-box' },
   sl = { class: 'sticky-box-wrapper' },
   nl = Yn({
