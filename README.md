@@ -2,6 +2,8 @@
 
 A simple and lightweight Vue 3 component for creating sticky containers with ease. It provides flexible options to control the sticky behavior and supports offsets from the viewport.
 
+You can check the [Demo Page](https://navidkhm.github.io/vue-sticky-box/)
+
 ## Requirements
 
 ### 🎨 Styling
