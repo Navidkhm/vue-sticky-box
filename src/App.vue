@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import logo from './assets/vue-sticky-box-logo.png';
 import StickyBox from './components/StickyBox.vue';
 import { reactive, ref } from 'vue';
 
@@ -66,7 +67,7 @@ const scrollInto = (ref) => {
     <div class="intro py-8">
       <div class="flex-col flex-center">
         <div class="intro-heading flex-center h1">
-          <!-- <img :src="logI" alt="vue-sticky-box-logo" width="100px" /> -->
+          <img :src="logo" alt="vue-sticky-box-logo" width="100px" />
           <h1 class="text-center mb-0">Vue Sticky Box</h1>
         </div>
 
